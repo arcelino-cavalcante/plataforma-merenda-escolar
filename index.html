@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Distribuição de Merenda Escolar</title>
+    <!-- Tailwind CSS para uma estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter para uma melhor legibilidade -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilo base para a fonte e transições suaves */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background-color: #374151;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Esconde a view inativa */
+        .hidden-view {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Plataforma de Merenda Escolar</h1>
+            <p class="text-gray-600 mt-2">Gestão de estoque e distribuição para almoxarifado e escolas.</p>
+        </header>
+
+        <!-- Botões de Navegação -->
+        <div id="main-nav-buttons" class="flex justify-center space-x-4 mb-8">
+            <button id="btn-show-admin-login" class="btn btn-primary">Painel do Almoxarifado</button>
+            <button id="btn-show-escola-login" class="btn btn-secondary">Painel da Escola</button>
+        </div>
+
+        <!-- Mensagem de Status -->
+        <div id="status-message" class="text-center mb-4 p-3 rounded-lg hidden"></div>
+
+        <!-- ==================================================== -->
+        <!-- =========== TELA DE LOGIN DO ALMOXARIFADO ========== -->
+        <!-- ==================================================== -->
+        <div id="admin-login-view" class="hidden-view">
+            <div class="card max-w-lg mx-auto text-center">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Acessar Painel do Almoxarifado</h2>
+                <form id="form-admin-login">
+                    <input type="password" id="admin-password" class="input-field mb-4"
+                        placeholder="Senha de Administrador" required>
+                    <button type="submit" class="btn btn-primary w-full">Acessar</button>
+                </form>
+                <button id="btn-back-to-main-nav-1" class="mt-4 text-sm text-blue-600 hover:underline">Voltar</button>
+            </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- ============ PAINEL DO ALMOXARIFADO (ADMIN) ========== -->
+        <!-- ==================================================== -->
+        <div id="admin-view" class="hidden-view">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-700">Painel do Almoxarifado</h2>
+                <button id="btn-admin-logout" class="btn btn-danger">Sair</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Coluna 1: Cadastros -->
+                <div class="lg:col-span-1">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">1. Cadastrar Escola</h3>
+                        <form id="form-add-school">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="new-school-name"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Nome da Escola</label>
+                                    <input type="text" id="new-school-name" class="input-field"
+                                        placeholder="Nome único da escola" required>
+                                </div>
+                                <div>
+                                    <label for="new-school-password"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Senha da Escola</label>
+                                    <input type="password" id="new-school-password" class="input-field"
+                                        placeholder="Crie uma senha" required>
+                                </div>
+                                <button type="submit" class="btn btn-secondary w-full">Cadastrar Escola</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">2. Cadastrar Novo Item</h3>
+                        <form id="form-add-item">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="item-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do
+                                        Item</label>
+                                    <input type="text" id="item-name" class="input-field" placeholder="Ex: Arroz (5kg)"
+                                        required>
+                                </div>
+                                <div>
+                                    <label for="item-quantity"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Quantidade Recebida</label>
+                                    <input type="number" id="item-quantity" class="input-field" min="1"
+                                        placeholder="Ex: 100" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">Cadastrar Item</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Distribuição -->
+                <div class="lg:col-span-1">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">3. Distribuir Itens</h3>
+                        <form id="form-distribute-item">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="distribute-school-select"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Selecione a Escola</label>
+                                    <select id="distribute-school-select" class="input-field" required></select>
+                                </div>
+                                <div id="distribution-items-container" class="space-y-4"></div>
+                                <button type="button" id="btn-add-distribution-item"
+                                    class="btn btn-secondary w-full">Adicionar Item à Distribuição</button>
+                                <hr>
+                                <button type="submit" class="btn btn-primary w-full text-lg">Realizar
+                                    Distribuição</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Coluna 3: Estoque e Histórico -->
+                <div class="lg:col-span-1">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Estoque Geral</h3>
+                        <div id="main-stock-list" class="space-y-3 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Histórico de Distribuições</h3>
+                        <div id="distribution-history-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- ================ PAINEL DA ESCOLA ================== -->
+        <!-- ==================================================== -->
+        <div id="escola-view" class="hidden-view">
+            <div id="escola-login" class="card max-w-lg mx-auto text-center">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Acessar Painel da Escola</h2>
+                <form id="form-escola-login">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="login-school-select"
+                                class="block text-sm font-medium text-gray-700 mb-1 text-left">Selecione sua
+                                Escola</label>
+                            <select id="login-school-select" class="input-field" required></select>
+                        </div>
+                        <div>
+                            <label for="login-school-password"
+                                class="block text-sm font-medium text-gray-700 mb-1 text-left">Sua Senha</label>
+                            <input type="password" id="login-school-password" class="input-field"
+                                placeholder="Digite a senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary w-full">Acessar Painel</button>
+                    </div>
+                </form>
+                <button id="btn-back-to-main-nav-2" class="mt-4 text-sm text-blue-600 hover:underline">Voltar</button>
+            </div>
+
+            <div id="escola-dashboard" class="hidden-view">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-700">Painel da <span id="logged-school-name"
+                            class="text-blue-600"></span></h2>
+                    <button id="btn-logout-escola" class="btn btn-danger">Sair</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="card">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800">Estoque Local</h3>
+                            <div id="school-stock-list" class="space-y-3 max-h-60 overflow-y-auto pr-2"></div>
+                        </div>
+                        <div class="card">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800">Registrar Consumo Diário</h3>
+                            <form id="form-consume-item">
+                                <div class="space-y-4">
+                                    <div id="consumption-items-container" class="space-y-4"></div>
+                                    <button type="button" id="btn-add-consumption-item"
+                                        class="btn btn-secondary w-full">Adicionar Item</button>
+                                    <hr>
+                                    <button type="submit" class="btn btn-primary w-full text-lg">Registrar
+                                        Consumo</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Relatório de Retiradas</h3>
+                        <div id="consumption-history-list" class="space-y-3 max-h-[34rem] overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            let db;
+            let currentSchool = null;
+            let productOptionsHTML = '<option value="">Selecione um item...</option>';
+            let schoolStockOptionsHTML = '<option value="">Selecione um item...</option>';
+
+            // Elementos da UI
+            const mainNavButtons = document.getElementById('main-nav-buttons');
+            const statusMessage = document.getElementById('status-message');
+
+            // Views
+            const adminLoginView = document.getElementById('admin-login-view');
+            const adminView = document.getElementById('admin-view');
+            const escolaView = document.getElementById('escola-view');
+            const escolaLogin = document.getElementById('escola-login');
+            const escolaDashboard = document.getElementById('escola-dashboard');
+
+            // Formulários
+            const formAdminLogin = document.getElementById('form-admin-login');
+            const formAddSchool = document.getElementById('form-add-school');
+            const formAddItem = document.getElementById('form-add-item');
+            const formDistributeItem = document.getElementById('form-distribute-item');
+            const formEscolaLogin = document.getElementById('form-escola-login');
+            const formConsumeItem = document.getElementById('form-consume-item');
+
+            // Botões
+            const btnShowAdminLogin = document.getElementById('btn-show-admin-login');
+            const btnShowEscolaLogin = document.getElementById('btn-show-escola-login');
+            const btnAdminLogout = document.getElementById('btn-admin-logout');
+            const btnLogoutEscola = document.getElementById('btn-logout-escola');
+            const btnAddDistributionItem = document.getElementById('btn-add-distribution-item');
+            const btnAddConsumptionItem = document.getElementById('btn-add-consumption-item');
+            document.getElementById('btn-back-to-main-nav-1').addEventListener('click', showMainNavigation);
+            document.getElementById('btn-back-to-main-nav-2').addEventListener('click', showMainNavigation);
+
+            // Listas e Displays
+            const mainStockList = document.getElementById('main-stock-list');
+            const distributionHistoryList = document.getElementById('distribution-history-list');
+            const schoolStockList = document.getElementById('school-stock-list');
+            const consumptionHistoryList = document.getElementById('consumption-history-list');
+            const loggedSchoolName = document.getElementById('logged-school-name');
+            const distributionItemsContainer = document.getElementById('distribution-items-container');
+            const consumptionItemsContainer = document.getElementById('consumption-items-container');
+            const distributeSchoolSelect = document.getElementById('distribute-school-select');
+            const loginSchoolSelect = document.getElementById('login-school-select');
+
+
+            function initDB() {
+                // ATUALIZADO: Versão 2 para adicionar a nova tabela
+                const request = indexedDB.open('merendaDB', 2);
+
+                request.onerror = (event) => {
+                    console.error('Erro ao abrir o IndexedDB:', event.target.error);
+                    showStatus('Erro crítico ao carregar o banco de dados.', 'error');
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('Banco de dados aberto com sucesso.');
+                    // Popula as opções de escolas nos formulários
+                    renderSchoolSelectOptions();
+                };
+
+                // ATUALIZADO: Adiciona a nova object store 'credenciais_escolas'
+                request.onupgradeneeded = (event) => {
+                    const dbInstance = event.target.result;
+                    // Cria as stores apenas se não existirem
+                    if (!dbInstance.objectStoreNames.contains('produtos')) {
+                        const produtosStore = dbInstance.createObjectStore('produtos', { keyPath: 'id', autoIncrement: true });
+                        produtosStore.createIndex('nome', 'nome', { unique: true });
+                    }
+                    if (!dbInstance.objectStoreNames.contains('escolas')) {
+                        const escolasStore = dbInstance.createObjectStore('escolas', { keyPath: 'id', autoIncrement: true });
+                        escolasStore.createIndex('escola_produto', ['nomeEscola', 'idProduto'], { unique: true });
+                        escolasStore.createIndex('nomeEscola', 'nomeEscola', { unique: false });
+                    }
+                    if (!dbInstance.objectStoreNames.contains('distribuicoes')) {
+                        dbInstance.createObjectStore('distribuicoes', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!dbInstance.objectStoreNames.contains('consumos')) {
+                        // FIX: A variável 'consumosStore' foi definida antes de ser usada.
+                        const consumosStore = dbInstance.createObjectStore('consumos', { keyPath: 'id', autoIncrement: true });
+                        consumosStore.createIndex('nomeEscola', 'nomeEscola', { unique: false });
+                    }
+                    // NOVO: Store para credenciais das escolas
+                    if (!dbInstance.objectStoreNames.contains('credenciais_escolas')) {
+                        const credenciaisStore = dbInstance.createObjectStore('credenciais_escolas', { keyPath: 'id', autoIncrement: true });
+                        credenciaisStore.createIndex('nome', 'nome', { unique: true });
+                    }
+                };
+            }
+
+            function showStatus(message, type = 'success') {
+                statusMessage.textContent = message;
+                statusMessage.className = `text-center mb-4 p-3 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+                statusMessage.classList.remove('hidden');
+                setTimeout(() => statusMessage.classList.add('hidden'), 4000);
+            }
+
+            function showMainNavigation() {
+                mainNavButtons.classList.remove('hidden-view');
+                adminLoginView.classList.add('hidden-view');
+                adminView.classList.add('hidden-view');
+                escolaView.classList.add('hidden-view');
+                escolaLogin.classList.remove('hidden-view');
+                escolaDashboard.classList.add('hidden-view');
+            }
+
+            // ====================================================
+            // ============ FUNÇÕES DE AUTENTICAÇÃO E CADASTRO ====
+            // ====================================================
+
+            btnShowAdminLogin.addEventListener('click', () => {
+                mainNavButtons.classList.add('hidden-view');
+                adminLoginView.classList.remove('hidden-view');
+            });
+
+            btnShowEscolaLogin.addEventListener('click', () => {
+                mainNavButtons.classList.add('hidden-view');
+                escolaView.classList.remove('hidden-view');
+            });
+
+            formAdminLogin.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = document.getElementById('admin-password').value;
+                if (password === 'senha123') {
+                    adminLoginView.classList.add('hidden-view');
+                    adminView.classList.remove('hidden-view');
+                    renderAllAdminData();
+                } else {
+                    showStatus('Senha incorreta!', 'error');
+                }
+                formAdminLogin.reset();
+            });
+
+            btnAdminLogout.addEventListener('click', showMainNavigation);
+
+            formAddSchool.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const schoolName = document.getElementById('new-school-name').value.trim();
+                const schoolPassword = document.getElementById('new-school-password').value.trim();
+
+                const transaction = db.transaction(['credenciais_escolas'], 'readwrite');
+                const store = transaction.objectStore('credenciais_escolas');
+                const request = store.add({ nome: schoolName, senha: schoolPassword });
+
+                request.onsuccess = () => {
+                    showStatus(`Escola "${schoolName}" cadastrada com sucesso!`);
+                    formAddSchool.reset();
+                    renderSchoolSelectOptions(); // Atualiza os selects
+                };
+                request.onerror = (event) => {
+                    if (event.target.error.name === 'ConstraintError') {
+                        showStatus('Erro: Já existe uma escola com este nome.', 'error');
+                    } else {
+                        showStatus('Erro ao cadastrar a escola.', 'error');
+                    }
+                };
+            });
+
+            function renderSchoolSelectOptions() {
+                const transaction = db.transaction(['credenciais_escolas'], 'readonly');
+                const store = transaction.objectStore('credenciais_escolas');
+                const request = store.getAll();
+
+                request.onsuccess = (event) => {
+                    const schools = event.target.result;
+                    let optionsHTML = '<option value="">Selecione uma escola...</option>';
+                    schools.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(school => {
+                        optionsHTML += `<option value="${school.nome}">${school.nome}</option>`;
+                    });
+                    distributeSchoolSelect.innerHTML = optionsHTML;
+                    loginSchoolSelect.innerHTML = optionsHTML;
+                };
+            }
+
+            // ====================================================
+            // ============ FUNÇÕES DO PAINEL ADMIN ===============
+            // ====================================================
+
+            function renderAllAdminData() {
+                renderMainStock();
+                renderDistributionHistory();
+            }
+
+            formAddItem.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const itemName = document.getElementById('item-name').value.trim();
+                const itemQuantity = parseInt(document.getElementById('item-quantity').value);
+                const newItem = { nome: itemName, quantidade: itemQuantity, dataCadastro: new Date() };
+                const transaction = db.transaction(['produtos'], 'readwrite');
+                const store = transaction.objectStore('produtos');
+                const request = store.add(newItem);
+                request.onsuccess = () => {
+                    showStatus(`Item "${itemName}" cadastrado com sucesso!`);
+                    formAddItem.reset();
+                    renderAllAdminData();
+                };
+                request.onerror = (event) => {
+                    if (event.target.error.name === 'ConstraintError') {
+                        showStatus('Erro: Já existe um item com este nome.', 'error');
+                    } else {
+                        showStatus('Erro ao cadastrar o item.', 'error');
+                    }
+                };
+            });
+
+            btnAddDistributionItem.addEventListener('click', () => {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'distribution-item-row grid grid-cols-1 sm:grid-cols-3 gap-2 items-center p-2 border rounded-md';
+                itemRow.innerHTML = `<div class="col-span-1 sm:col-span-2"><select class="input-field distribute-item-select-multi" required>${productOptionsHTML}</select></div><div><input type="number" class="input-field distribute-quantity-multi" min="1" placeholder="Qtd." required></div><button type="button" class="btn btn-danger btn-remove-item text-sm py-1 px-2 w-full sm:w-auto">Remover</button>`;
+                distributionItemsContainer.appendChild(itemRow);
+                itemRow.querySelector('.btn-remove-item').addEventListener('click', () => itemRow.remove());
+            });
+
+            formDistributeItem.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const schoolName = document.getElementById('distribute-school-select').value;
+                const itemRows = distributionItemsContainer.querySelectorAll('.distribution-item-row');
+                if (!schoolName) {
+                    showStatus('Por favor, selecione uma escola.', 'error'); return;
+                }
+                if (itemRows.length === 0) {
+                    showStatus('Adicione pelo menos um item para a distribuição.', 'error'); return;
+                }
+                const itemsToDistribute = [];
+                const selectedItemIds = new Set();
+                for (const row of itemRows) {
+                    const itemId = parseInt(row.querySelector('.distribute-item-select-multi').value);
+                    const quantity = parseInt(row.querySelector('.distribute-quantity-multi').value);
+                    if (!itemId || !quantity || quantity <= 0) {
+                        showStatus('Verifique se todos os itens e quantidades são válidos.', 'error'); return;
+                    }
+                    if (selectedItemIds.has(itemId)) {
+                        showStatus('Não é possível distribuir o mesmo item duas vezes na mesma operação.', 'error'); return;
+                    }
+                    selectedItemIds.add(itemId);
+                    itemsToDistribute.push({ itemId, quantity });
+                }
+                const transaction = db.transaction(['produtos', 'escolas', 'distribuicoes'], 'readwrite');
+                let errorOccurred = false;
+                const distributionPromises = itemsToDistribute.map(item => new Promise((resolve, reject) => {
+                    const produtosStore = transaction.objectStore('produtos');
+                    const productReq = produtosStore.get(item.itemId);
+                    productReq.onsuccess = e => {
+                        const produto = e.target.result;
+                        if (!produto || produto.quantidade < item.quantity) {
+                            return reject(`Estoque insuficiente de "${produto ? produto.nome : 'item desconhecido'}".`);
+                        }
+                        produto.quantidade -= item.quantity;
+                        produtosStore.put(produto);
+                        transaction.objectStore('distribuicoes').add({ nomeEscola: schoolName, nomeItem: produto.nome, idProduto: produto.id, quantidade: item.quantity, data: new Date() });
+                        const escolasStore = transaction.objectStore('escolas');
+                        const escolaIndex = escolasStore.index('escola_produto');
+                        const escolaReq = escolaIndex.get([schoolName, item.itemId]);
+                        escolaReq.onsuccess = e => {
+                            const estoqueEscola = e.target.result;
+                            if (estoqueEscola) {
+                                estoqueEscola.quantidade += item.quantity;
+                                escolasStore.put(estoqueEscola);
+                            } else {
+                                escolasStore.add({ nomeEscola: schoolName, idProduto: item.itemId, nomeItem: produto.nome, quantidade: item.quantity });
+                            }
+                            resolve();
+                        };
+                        escolaReq.onerror = (e) => reject('Erro ao buscar estoque da escola.');
+                    };
+                    productReq.onerror = (e) => reject('Erro ao buscar produto.');
+                }));
+                Promise.all(distributionPromises).catch(errorMsg => {
+                    errorOccurred = true;
+                    showStatus(errorMsg, 'error');
+                    transaction.abort();
+                });
+                transaction.oncomplete = () => {
+                    if (!errorOccurred) {
+                        showStatus(`Distribuição para "${schoolName}" realizada com sucesso!`);
+                        formDistributeItem.reset();
+                        distributionItemsContainer.innerHTML = '';
+                        renderAllAdminData();
+                    }
+                };
+            });
+
+            function renderMainStock() {
+                const transaction = db.transaction(['produtos'], 'readonly');
+                const store = transaction.objectStore('produtos');
+                const request = store.getAll();
+                request.onsuccess = (event) => {
+                    const items = event.target.result;
+                    mainStockList.innerHTML = '';
+                    let options = '<option value="">Selecione um item...</option>';
+                    if (items.length === 0) {
+                        mainStockList.innerHTML = '<p class="text-gray-500">Nenhum item cadastrado ainda.</p>';
+                    } else {
+                        items.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(item => {
+                            const stockItemDiv = document.createElement('div');
+                            stockItemDiv.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
+                            stockItemDiv.innerHTML = `<span class="font-medium text-gray-700">${item.nome}</span><span class="font-bold text-lg text-blue-600">${item.quantidade}</span>`;
+                            mainStockList.appendChild(stockItemDiv);
+                            if (item.quantidade > 0) {
+                                options += `<option value="${item.id}">${item.nome} (Estoque: ${item.quantidade})</option>`;
+                            }
+                        });
+                    }
+                    productOptionsHTML = options;
+                };
+            }
+
+            function renderDistributionHistory() {
+                const transaction = db.transaction(['distribuicoes'], 'readonly');
+                const store = transaction.objectStore('distribuicoes');
+                const request = store.getAll();
+                request.onsuccess = (event) => {
+                    const history = event.target.result;
+                    distributionHistoryList.innerHTML = '';
+                    if (history.length === 0) {
+                        distributionHistoryList.innerHTML = '<p class="text-gray-500">Nenhuma distribuição realizada.</p>'; return;
+                    }
+                    history.sort((a, b) => b.data - a.data).forEach(item => {
+                        const historyItemDiv = document.createElement('div');
+                        historyItemDiv.className = 'p-3 bg-gray-50 rounded-lg border border-gray-200';
+                        historyItemDiv.innerHTML = `<p class="font-semibold text-gray-800">${item.nomeEscola}</p><p class="text-sm text-gray-600">Recebeu <strong class="text-blue-600">${item.quantidade}x</strong> de <strong class="text-gray-700">${item.nomeItem}</strong></p><p class="text-xs text-gray-400 mt-1">${item.data.toLocaleString('pt-BR')}</p>`;
+                        distributionHistoryList.appendChild(historyItemDiv);
+                    });
+                };
+            }
+
+            // ====================================================
+            // ============ FUNÇÕES DO PAINEL ESCOLA ==============
+            // ====================================================
+
+            formEscolaLogin.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const schoolName = loginSchoolSelect.value;
+                const password = document.getElementById('login-school-password').value;
+                if (!schoolName) {
+                    showStatus('Por favor, selecione sua escola.', 'error'); return;
+                }
+
+                const transaction = db.transaction(['credenciais_escolas'], 'readonly');
+                const store = transaction.objectStore('credenciais_escolas');
+                const index = store.index('nome');
+                const request = index.get(schoolName);
+
+                request.onsuccess = (event) => {
+                    const school = event.target.result;
+                    if (school && school.senha === password) {
+                        currentSchool = schoolName;
+                        loggedSchoolName.textContent = currentSchool;
+                        escolaLogin.classList.add('hidden-view');
+                        escolaDashboard.classList.remove('hidden-view');
+                        consumptionItemsContainer.innerHTML = '';
+                        renderAllSchoolData(currentSchool);
+                    } else {
+                        showStatus('Nome da escola ou senha incorretos.', 'error');
+                    }
+                    formEscolaLogin.reset();
+                };
+            });
+
+            btnLogoutEscola.addEventListener('click', () => {
+                currentSchool = null;
+                escolaLogin.classList.remove('hidden-view');
+                escolaDashboard.classList.add('hidden-view');
+                escolaView.classList.add('hidden-view');
+                mainNavButtons.classList.remove('hidden-view');
+            });
+
+            btnAddConsumptionItem.addEventListener('click', () => {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'consumption-item-row grid grid-cols-1 sm:grid-cols-3 gap-2 items-center p-2 border rounded-md';
+                itemRow.innerHTML = `<div class="col-span-1 sm:col-span-2"><select class="input-field consume-item-select-multi" required>${schoolStockOptionsHTML}</select></div><div><input type="number" class="input-field consume-quantity-multi" min="1" placeholder="Qtd." required></div><button type="button" class="btn btn-danger btn-remove-item text-sm py-1 px-2 w-full sm:w-auto">Remover</button>`;
+                consumptionItemsContainer.appendChild(itemRow);
+                itemRow.querySelector('.btn-remove-item').addEventListener('click', () => itemRow.remove());
+            });
+
+            formConsumeItem.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const itemRows = consumptionItemsContainer.querySelectorAll('.consumption-item-row');
+                if (itemRows.length === 0) {
+                    showStatus('Adicione pelo menos um item para registrar o consumo.', 'error'); return;
+                }
+                const itemsToConsume = [];
+                const selectedStockIds = new Set();
+                for (const row of itemRows) {
+                    const stockId = parseInt(row.querySelector('.consume-item-select-multi').value);
+                    const quantity = parseInt(row.querySelector('.consume-quantity-multi').value);
+                    if (!stockId || !quantity || quantity <= 0) {
+                        showStatus('Verifique se todos os itens e quantidades são válidos.', 'error'); return;
+                    }
+                    if (selectedStockIds.has(stockId)) {
+                        showStatus('Não é possível consumir o mesmo item duas vezes na mesma operação.', 'error'); return;
+                    }
+                    selectedStockIds.add(stockId);
+                    itemsToConsume.push({ stockId, quantity });
+                }
+                const transaction = db.transaction(['escolas', 'consumos'], 'readwrite');
+                let errorOccurred = false;
+                const consumptionPromises = itemsToConsume.map(item => new Promise((resolve, reject) => {
+                    const escolasStore = transaction.objectStore('escolas');
+                    const stockReq = escolasStore.get(item.stockId);
+                    stockReq.onsuccess = e => {
+                        const stockItem = e.target.result;
+                        if (!stockItem || stockItem.quantidade < item.quantity) {
+                            return reject(`Estoque insuficiente de "${stockItem ? stockItem.nomeItem : 'item desconhecido'}".`);
+                        }
+                        stockItem.quantidade -= item.quantity;
+                        escolasStore.put(stockItem);
+                        transaction.objectStore('consumos').add({ nomeEscola: currentSchool, nomeItem: stockItem.nomeItem, idProduto: stockItem.idProduto, quantidade: item.quantity, data: new Date() });
+                        resolve();
+                    };
+                    stockReq.onerror = e => reject('Erro ao buscar item do estoque da escola.');
+                }));
+                Promise.all(consumptionPromises).catch(errorMsg => {
+                    errorOccurred = true;
+                    showStatus(errorMsg, 'error');
+                    transaction.abort();
+                });
+                transaction.oncomplete = () => {
+                    if (!errorOccurred) {
+                        showStatus('Consumo registrado com sucesso!');
+                        consumptionItemsContainer.innerHTML = '';
+                        renderAllSchoolData(currentSchool);
+                    }
+                };
+            });
+
+            function renderAllSchoolData(schoolName) {
+                renderSchoolStock(schoolName);
+                renderConsumptionHistory(schoolName);
+            }
+
+            function renderSchoolStock(schoolName) {
+                const transaction = db.transaction(['escolas'], 'readonly');
+                const store = transaction.objectStore('escolas');
+                const index = store.index('nomeEscola');
+                const request = index.getAll(schoolName);
+                request.onsuccess = (event) => {
+                    const items = event.target.result;
+                    schoolStockList.innerHTML = '';
+                    let options = '<option value="">Selecione um item...</option>';
+                    if (items.length === 0) {
+                        schoolStockList.innerHTML = '<p class="text-gray-500">Nenhum item recebido.</p>';
+                    } else {
+                        items.sort((a, b) => a.nomeItem.localeCompare(b.nomeItem)).forEach(item => {
+                            const stockItemDiv = document.createElement('div');
+                            stockItemDiv.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
+                            stockItemDiv.innerHTML = `<span class="font-medium text-gray-700">${item.nomeItem}</span><span class="font-bold text-lg text-blue-600">${item.quantidade}</span>`;
+                            schoolStockList.appendChild(stockItemDiv);
+                            if (item.quantidade > 0) {
+                                options += `<option value="${item.id}">${item.nomeItem} (Disponível: ${item.quantidade})</option>`;
+                            }
+                        });
+                    }
+                    schoolStockOptionsHTML = options;
+                };
+            }
+
+            function renderConsumptionHistory(schoolName) {
+                const transaction = db.transaction(['consumos'], 'readonly');
+                const store = transaction.objectStore('consumos');
+                const index = store.index('nomeEscola');
+                const request = index.getAll(schoolName);
+                request.onsuccess = (event) => {
+                    const history = event.target.result;
+                    consumptionHistoryList.innerHTML = '';
+                    if (history.length === 0) {
+                        consumptionHistoryList.innerHTML = '<p class="text-gray-500">Nenhum consumo registrado.</p>'; return;
+                    }
+                    history.sort((a, b) => b.data - a.data).forEach(item => {
+                        const historyItemDiv = document.createElement('div');
+                        historyItemDiv.className = 'p-3 bg-gray-50 rounded-lg border border-gray-200';
+                        historyItemDiv.innerHTML = `<p class="text-sm text-gray-600">Retirada de <strong class="text-blue-600">${item.quantidade}x</strong> de <strong class="text-gray-700">${item.nomeItem}</strong></p><p class="text-xs text-gray-400 mt-1">${item.data.toLocaleString('pt-BR')}</p>`;
+                        consumptionHistoryList.appendChild(historyItemDiv);
+                    });
+                };
+            }
+
+            initDB();
+        });
+    </script>
+</body>
+
+</html>
